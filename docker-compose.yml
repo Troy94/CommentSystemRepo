@@ -1,0 +1,84 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourPassword123!
+      - MSSQL_PID=Express
+    volumes:
+      - db_data:/var/opt/mssql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "sqlservr"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "rabbitmq"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  comment_api:
+    build:
+      context: .                                         # корень решения (ProjectComments)
+      dockerfile: CommentSystem.Presentation/Dockerfile  # путь к Dockerfile относительно контекста
+    container_name: comment_api
+    environment:
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CommentSystemDb;User Id=sa;Password=YourPassword123!;TrustServerCertificate=true;
+      - Redis__Host=redis:6379
+      - MessageBroker__Host=amqp://rabbitmq
+    ports:
+      - "5000:5000"
+    depends_on:
+      - sqlserver
+      - redis
+      - rabbitmq
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "dotnet CommentSystem.Presentation.dll"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
