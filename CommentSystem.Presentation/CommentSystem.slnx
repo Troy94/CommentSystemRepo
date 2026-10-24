@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../CommentSystem.Core/CommentSystem.Core.csproj" />
+  <Project Path="../CommentSystem.Data/CommentSystem.Data.csproj" />
+  <Project Path="CommentSystem.Presentation.csproj" />
+</Solution>
