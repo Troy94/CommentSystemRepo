@@ -19,6 +19,8 @@ builder.Services.AddDbContext<CommentDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddSingleton<ICommentNotificationService, CommentNotificationService>();
+builder.Services.AddHostedService<CommentCreatedConsumer>();
 builder.Services.AddHealthChecks();
 
 builder.Services.AddControllers();

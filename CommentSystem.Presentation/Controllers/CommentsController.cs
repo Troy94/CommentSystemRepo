@@ -12,12 +12,14 @@
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICacheService _cacheService;
+        private readonly ICommentNotificationService _commentNotificationService;
         private readonly ILogger<CommentsController> _logger;
 
-        public CommentsController(IUnitOfWork unitOfWork, ICacheService cacheService, ILogger<CommentsController> logger)
+        public CommentsController(IUnitOfWork unitOfWork, ICacheService cacheService, ICommentNotificationService commentNotificationService, ILogger<CommentsController> logger)
         {
             _unitOfWork = unitOfWork;
             _cacheService = cacheService;
+            _commentNotificationService = commentNotificationService;
             _logger = logger;
         }
 
@@ -65,6 +67,7 @@
             await _unitOfWork.CompleteAsync();
 
             await _cacheService.RemoveAsync(CacheKeys.AllComments);
+            await _commentNotificationService.NotifyCommentCreatedAsync(comment);
             return CreatedAtAction(nameof(GetById), new { id = comment.Id }, comment);
         }
 
