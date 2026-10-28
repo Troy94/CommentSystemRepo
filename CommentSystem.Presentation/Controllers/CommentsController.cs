@@ -4,8 +4,10 @@
     using System.Text.Encodings.Web;
     using CommentSystem.Core.Entities;
     using CommentSystem.Core.Interfaces;
+    using CommentSystem.Presentation.Hubs;
     using CommentSystem.Presentation.Services;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.SignalR;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -17,14 +19,16 @@
         private readonly ICacheService _cacheService;
         private readonly ICommentNotificationService _commentNotificationService;
         private readonly ICaptchaVerificationService _captchaVerificationService;
+        private readonly IHubContext<CommentHub> _hubContext;
         private readonly ILogger<CommentsController> _logger;
 
-        public CommentsController(IUnitOfWork unitOfWork, ICacheService cacheService, ICommentNotificationService commentNotificationService, ICaptchaVerificationService captchaVerificationService, ILogger<CommentsController> logger)
+        public CommentsController(IUnitOfWork unitOfWork, ICacheService cacheService, ICommentNotificationService commentNotificationService, ICaptchaVerificationService captchaVerificationService, IHubContext<CommentHub> hubContext, ILogger<CommentsController> logger)
         {
             _unitOfWork = unitOfWork;
             _cacheService = cacheService;
             _commentNotificationService = commentNotificationService;
             _captchaVerificationService = captchaVerificationService;
+            _hubContext = hubContext;
             _logger = logger;
         }
 
@@ -142,6 +146,7 @@
 
             await _cacheService.RemoveAsync(CacheKeys.AllComments);
             await _commentNotificationService.NotifyCommentCreatedAsync(createdComment);
+            await _hubContext.Clients.All.SendAsync("CommentCreated", createdComment);
             return CreatedAtAction(nameof(GetById), new { id = createdComment.Id }, createdComment);
         }
 
@@ -177,6 +182,7 @@
 
             await _cacheService.RemoveAsync(CacheKeys.AllComments);
             await _cacheService.RemoveAsync(CacheKeys.CommentById(id));
+            await _hubContext.Clients.All.SendAsync("CommentUpdated", new { id, comment = existing });
             return NoContent();
         }
 
@@ -201,6 +207,7 @@
 
             await _cacheService.RemoveAsync(CacheKeys.AllComments);
             await _cacheService.RemoveAsync(CacheKeys.CommentById(id));
+            await _hubContext.Clients.All.SendAsync("CommentDeleted", new { id });
             return NoContent();
         }
 

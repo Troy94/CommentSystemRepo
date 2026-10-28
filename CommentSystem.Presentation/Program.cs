@@ -1,5 +1,6 @@
 using CommentSystem.Core.Interfaces;
 using CommentSystem.Data;
+using CommentSystem.Presentation.Hubs;
 using CommentSystem.Presentation.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -21,6 +22,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddSingleton<ICommentNotificationService, CommentNotificationService>();
 builder.Services.AddHttpClient<ICaptchaVerificationService, CaptchaVerificationService>();
+builder.Services.AddSignalR();
 builder.Services.AddHostedService<CommentCreatedConsumer>();
 builder.Services.AddHealthChecks();
 
@@ -119,6 +121,7 @@ app.UseCors(policy =>
               .AllowAnyMethod()
               .AllowAnyHeader());
 
-    app.UseAuthorization();
-    app.MapControllers();
-    app.Run();
+app.UseAuthorization();
+app.MapHub<CommentHub>("/hubs/comments");
+app.MapControllers();
+app.Run();
