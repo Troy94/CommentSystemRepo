@@ -1,0 +1,134 @@
+.comment-list {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comment-list h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+.comment-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comment-item {
+  border-left: 4px solid #007bff;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  transition: transform 0.2s;
+}
+
+.comment-item:hover {
+  transform: translateX(5px);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.comment-header strong {
+  color: #333;
+  font-size: 16px;
+}
+
+.comment-date {
+  color: #999;
+  font-size: 12px;
+}
+
+.comment-content p {
+  margin: 10px 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btn-edit {
+  background: #28a745;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #218838;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+}
+
+.btn-save {
+  background: #28a745;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #218838;
+}
+
+.btn-cancel {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #5a6268;
+}
+
+.comment-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.no-comments {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-style: italic;
+}

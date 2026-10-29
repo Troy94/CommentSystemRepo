@@ -57,6 +57,7 @@ services:
       dockerfile: CommentSystem.Presentation/Dockerfile  # путь к Dockerfile относительно контекста
     container_name: comment_api
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CommentSystemDb;User Id=sa;Password=YourPassword123!;TrustServerCertificate=true;
       - Redis__Host=redis:6379
@@ -71,6 +72,24 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "pgrep", "-f", "dotnet CommentSystem.Presentation.dll"]
+      interval: 30s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  comment_client:
+    build:
+      context: ./comment-demo-client
+      dockerfile: Dockerfile
+    container_name: comment_client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - comment_api
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
       interval: 30s
       retries: 5
       start_period: 10s

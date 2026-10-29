@@ -2,6 +2,7 @@
 {
     using System.ComponentModel.DataAnnotations;
     using System.Text.Encodings.Web;
+    using System.Text.Unicode;
     using CommentSystem.Core.Entities;
     using CommentSystem.Core.Interfaces;
     using CommentSystem.Presentation.Hubs;
@@ -14,6 +15,9 @@
     public class CommentsController : ControllerBase
     {
         private const int DefaultPageSize = 25;
+
+        // (экранируются только опасные для HTML символы: < > & " ' и т.п.).
+        private static readonly HtmlEncoder Encoder = HtmlEncoder.Create(UnicodeRanges.All);
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICacheService _cacheService;
@@ -124,11 +128,13 @@
                 }
             }
 
+            // В базе храним исходный текст (только Trim), HTML-кодирование
+            // выполняется один раз — при выдаче клиенту (SanitizeComment).
             var createdComment = new Comment
             {
-                UserName = SanitizeText(comment.UserName),
-                Email = SanitizeText(comment.Email),
-                Text = SanitizeText(comment.Text),
+                UserName = NormalizeText(comment.UserName),
+                Email = NormalizeText(comment.Email),
+                Text = NormalizeText(comment.Text),
                 ParentId = comment.ParentId,
                 CreatedAt = DateTime.UtcNow
             };
@@ -144,10 +150,12 @@
             await _unitOfWork.Comments.AddAsync(createdComment);
             await _unitOfWork.CompleteAsync();
 
+            var response = SanitizeComment(createdComment);
+
             await _cacheService.RemoveAsync(CacheKeys.AllComments);
             await _commentNotificationService.NotifyCommentCreatedAsync(createdComment);
-            await _hubContext.Clients.All.SendAsync("CommentCreated", createdComment);
-            return CreatedAtAction(nameof(GetById), new { id = createdComment.Id }, createdComment);
+            await _hubContext.Clients.All.SendAsync("CommentCreated", response);
+            return CreatedAtAction(nameof(GetById), new { id = createdComment.Id }, response);
         }
 
         [HttpPut("{id}")]
@@ -164,9 +172,9 @@
                 return NotFound();
             }
 
-            existing.UserName = SanitizeText(comment.UserName);
-            existing.Email = SanitizeText(comment.Email);
-            existing.Text = SanitizeText(comment.Text);
+            existing.UserName = NormalizeText(comment.UserName);
+            existing.Email = NormalizeText(comment.Email);
+            existing.Text = NormalizeText(comment.Text);
             existing.ParentId = comment.ParentId;
 
             if (!IsValidComment(existing))
@@ -182,7 +190,7 @@
 
             await _cacheService.RemoveAsync(CacheKeys.AllComments);
             await _cacheService.RemoveAsync(CacheKeys.CommentById(id));
-            await _hubContext.Clients.All.SendAsync("CommentUpdated", new { id, comment = existing });
+            await _hubContext.Clients.All.SendAsync("CommentUpdated", new { id, comment = SanitizeComment(existing) });
             return NoContent();
         }
 
@@ -296,9 +304,16 @@
             return true;
         }
 
+        // Fix: без HTML-кодирования.
+        private static string NormalizeText(string? value)
+        {
+            return value?.Trim() ?? string.Empty;
+        }
+
+        // Fix: HTML-кодирование для выдачи клиенту. Применяется ровно один раз.
         private static string SanitizeText(string? value)
         {
-            return HtmlEncoder.Default.Encode(value?.Trim() ?? string.Empty);
+            return Encoder.Encode(NormalizeText(value));
         }
 
         private static Comment SanitizeComment(Comment comment)

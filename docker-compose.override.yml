@@ -1,0 +1,17 @@
+version: '3.8'
+
+# Этот файл переопределяет параметры docker-compose.yml для локальной разработки
+# Используется только при разработке локально
+
+services:
+  comment_client:
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    # Для разработки с горячей перезагрузкой раскомментируйте:
+    # build:
+    #   context: ./comment-demo-client
+    #   dockerfile: Dockerfile.dev
+    # volumes:
+    #   - ./comment-demo-client:/app
+    #   - /app/node_modules
+    # command: npm start

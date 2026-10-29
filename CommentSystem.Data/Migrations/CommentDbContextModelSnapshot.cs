@@ -33,11 +33,33 @@ namespace CommentSystem.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Email");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("UserName");
 
                     b.ToTable("Comments");
 
@@ -46,19 +68,25 @@ namespace CommentSystem.Data.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2026, 10, 1, 9, 0, 0, 0, DateTimeKind.Utc),
-                            Text = "This is the first test comment"
+                            Email = "alice@example.com",
+                            Text = "This is the first test comment",
+                            UserName = "Alice"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2026, 10, 2, 10, 30, 0, 0, DateTimeKind.Utc),
-                            Text = "Huh, there is the second test comment"
+                            Email = "bob@example.com",
+                            Text = "Huh, there is the second test comment",
+                            UserName = "Bob"
                         },
                         new
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2026, 10, 3, 12, 15, 0, 0, DateTimeKind.Utc),
-                            Text = "What a miserable day, the third test comment!"
+                            Email = "charlie@example.com",
+                            Text = "What a miserable day, the third test comment!",
+                            UserName = "Charlie"
                         });
                 });
 #pragma warning restore 612, 618
