@@ -26,6 +26,18 @@ builder.Services.AddSignalR();
 builder.Services.AddHostedService<CommentCreatedConsumer>();
 builder.Services.AddHealthChecks();
 
+//  CORS для SignalR и Web requests
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); //для SignalR
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -116,12 +128,11 @@ app.MapGet("/health", async (CommentDbContext dbContext, IDistributedCache cache
     }, statusCode: allHealthy ? 200 : 503);
 });
 
-app.UseCors(policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader());
+app.UseCors("AllowReactApp");
 
 app.UseAuthorization();
-app.MapHub<CommentHub>("/hubs/comments");
+
+app.MapHub<CommentHub>("/commenthub");
+
 app.MapControllers();
 app.Run();
