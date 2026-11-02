@@ -1,6 +1,4 @@
-// Бекенд HTML-энкодит текст (&lt; &amp; ...). Для показа и для редактирования
-// его нужно декодировать. Результат выводим как обычный текст (React экранирует
-// сам), поэтому XSS невозможен, а при сохранении текст не кодируется дважды.
+
 export function decodeHtml(value) {
   const el = document.createElement('textarea');
   el.innerHTML = value ?? '';
