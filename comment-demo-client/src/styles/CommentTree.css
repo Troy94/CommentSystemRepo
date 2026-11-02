@@ -1,0 +1,51 @@
+/* Стили для новых элементов: ответы, пагинация, сортировка.
+   Остальные классы остаются в ваших CommentList.css / CommentForm.css */
+.comment-replies {
+  list-style: none;
+  margin: 12px 0 0 0;
+  padding-left: 16px;
+  border-left: 2px solid #c7d2fe;
+}
+
+.comment-replies .comment-item {
+  margin-top: 10px;
+}
+
+.comment-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.reply-form {
+  margin-top: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-reply {
+  background: #667eea;
+  color: #fff;
+}
+
+.sort-bar,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.pagination {
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

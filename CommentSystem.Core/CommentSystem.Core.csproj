@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CommentSystem.Data\CommentSystem.Data.csproj" />
-  </ItemGroup>
-
 </Project>

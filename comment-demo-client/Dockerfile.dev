@@ -1,0 +1,19 @@
+# Development Dockerfile с горячей перезагрузкой (для docker-compose)
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Установить глобальные зависимости для разработки
+RUN npm install -g serve
+
+# Копировать package*.json
+COPY package*.json ./
+
+# Установить зависимости
+RUN npm ci
+
+# Открыть порт
+EXPOSE 3000
+
+# Запустить приложение в режиме разработки
+CMD ["npm", "start"]
