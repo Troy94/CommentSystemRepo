@@ -4,10 +4,8 @@
 
 namespace CommentSystem.Data.Migrations
 {
-    /// <inheritdoc />
     public partial class UpdateCommentMetadata : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
@@ -41,26 +39,13 @@ namespace CommentSystem.Data.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "Email", "ParentId", "UserName" },
-                values: new object[] { "alice@example.com", null, "Alice" });
-
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "Id",
-                keyValue: 2,
-                columns: new[] { "Email", "ParentId", "UserName" },
-                values: new object[] { "bob@example.com", null, "Bob" });
-
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "Id",
-                keyValue: 3,
-                columns: new[] { "Email", "ParentId", "UserName" },
-                values: new object[] { "charlie@example.com", null, "Charlie" });
+            migrationBuilder.Sql(@"
+                UPDATE Comments
+                SET
+                    UserName = CONCAT('User', Id),
+                    Email = CONCAT('user', Id, '@mail.com'),
+                    ParentId = NULL
+            ");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_CreatedAt",
@@ -83,7 +68,6 @@ namespace CommentSystem.Data.Migrations
                 column: "UserName");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropIndex(
