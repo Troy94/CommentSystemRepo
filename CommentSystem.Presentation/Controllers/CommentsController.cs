@@ -128,8 +128,6 @@
                 }
             }
 
-            // В базе храним исходный текст (только Trim), HTML-кодирование
-            // выполняется один раз — при выдаче клиенту (SanitizeComment).
             var createdComment = new Comment
             {
                 UserName = NormalizeText(comment.UserName),
