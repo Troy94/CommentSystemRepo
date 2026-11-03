@@ -31,7 +31,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "https://symmetrical-goggles-qvq75g55qjg29jw-3000.app.github.dev"
+        )
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials(); 

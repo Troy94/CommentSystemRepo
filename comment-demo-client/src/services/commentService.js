@@ -1,6 +1,9 @@
 import * as signalR from '@microsoft/signalr';
 
-const API_URL = process.env.REACT_APP_API_URL || window.location.origin;
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  'https://symmetrical-goggles-qvq75g55qjg29jw-5000.app.github.dev';
+
 export const HUB_URL = `${API_URL}/commenthub`;
 const COMMENTS_URL = `${API_URL}/api/comments`;
 
