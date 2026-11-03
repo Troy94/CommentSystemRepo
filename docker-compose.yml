@@ -12,12 +12,6 @@ services:
       - db_data:/var/opt/mssql
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "pgrep", "-f", "sqlservr"]
-      interval: 30s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
 
   redis:
     image: redis:latest
@@ -26,12 +20,6 @@ services:
       - "6379:6379"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -44,56 +32,55 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "pgrep", "-f", "rabbitmq"]
-      interval: 30s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
 
   comment_api:
     build:
-      context: .                                         # корень решения (ProjectComments)
-      dockerfile: CommentSystem.Presentation/Dockerfile  # путь к Dockerfile относительно контекста
+      context: .
+      dockerfile: CommentSystem.Presentation/Dockerfile
+
     container_name: comment_api
+
+    ports:
+      - "5000:5000"
+
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
+
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CommentSystemDb;User Id=sa;Password=YourPassword123!;TrustServerCertificate=true;
+
       - Redis__Host=redis:6379
-      - MessageBroker__Host=amqp://rabbitmq
-    ports:
-      - "5000:5000"
+
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__UserName=guest
+      - RabbitMQ__Password=guest
+      - RabbitMQ__VirtualHost=/
+      - RabbitMQ__QueueName=comment-created-events
+
     depends_on:
       - sqlserver
       - redis
       - rabbitmq
+
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "pgrep", "-f", "dotnet CommentSystem.Presentation.dll"]
-      interval: 30s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
 
   comment_client:
     build:
       context: ./comment-demo-client
       dockerfile: Dockerfile
+
     container_name: comment_client
+
     ports:
       - "3000:3000"
+
     depends_on:
       - comment_api
+
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
-      interval: 30s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
 
 volumes:
   db_data:

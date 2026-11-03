@@ -1,6 +1,6 @@
 import * as signalR from '@microsoft/signalr';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || window.location.origin;
 export const HUB_URL = `${API_URL}/commenthub`;
 const COMMENTS_URL = `${API_URL}/api/comments`;
 
